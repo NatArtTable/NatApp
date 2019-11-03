@@ -6,7 +6,7 @@ import ImageViewer from '../components/ImageViewer';
 
 import repository from '../components/Repository';
 
-export default class ImageScreen extends React.Component {
+export default class AddImageScreen extends React.Component {
   static navigationOptions = {
     title: 'New Art Reference',
   };

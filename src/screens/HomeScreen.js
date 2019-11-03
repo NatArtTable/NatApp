@@ -91,7 +91,7 @@ class HomeScreen extends React.Component {
   }
 
   addImage(image) {
-    this.props.navigation.push('Image', {image});
+    this.props.navigation.push('AddImage', {image});
   }
 
   render() {

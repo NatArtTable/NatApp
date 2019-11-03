@@ -1,9 +1,8 @@
 import React from 'react';
-import {StyleSheet, View, ScrollView, Alert} from 'react-native';
+import {StyleSheet, TextInput, View, ScrollView, Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/EvilIcons';
 import repository from './Repository';
 import ImageViewer from './ImageViewer';
-import {Text} from 'react-native-elements';
 
 export default class ArtRefViewer extends React.Component {
   constructor(props) {
@@ -18,11 +17,17 @@ export default class ArtRefViewer extends React.Component {
     this.close = this.close.bind(this);
     this.render = this.render.bind(this);
     this._onPressTrash = this._onPressTrash.bind(this);
+    this._onPressSave = this._onPressSave.bind(this);
   }
 
   show(image) {
     console.log(`Showing ${JSON.stringify(image)}`);
-    this.setState({visible: true, image});
+    this.setState({
+      visible: true,
+      image,
+      description: image.description,
+      tagsText: image.tags.join(', '),
+    });
   }
 
   isVisible() {
@@ -32,6 +37,30 @@ export default class ArtRefViewer extends React.Component {
   close() {
     console.log('ArtRefViewer hide called!');
     this.setState({visible: false});
+  }
+
+  _onPressSave() {
+    const tags = this.state.tagsText
+      .split(/[.,\s]+/)
+      .map(tag => tag.trim().toLowerCase())
+      .filter(tag => tag.length > 0);
+
+    const description = this.state.description;
+
+    Alert.alert('Edit', 'You are sure you want to save your changes?', [
+      {
+        text: 'Do It!',
+        onPress: () => {
+          console.log(`Altering image! id: ${this.state.image.id}`);
+          repository
+            .updateImage(this.state.image.id, description, tags)
+            .then(() => this.props.reload())
+            .catch(e => console.error(e));
+          this.close();
+        },
+      },
+      {text: 'Cancel', onPress: () => console.log('Cancel Pressed')},
+    ]);
   }
 
   _onPressTrash() {
@@ -73,13 +102,37 @@ export default class ArtRefViewer extends React.Component {
             resizeMode="contain"
           />
           <View style={styles.infoContainer}>
-            <Text style={styles.text}>{this.state.image.description}</Text>
-            <Text style={styles.text}>{this.state.image.tags}</Text>
+            <TextInput
+              placeholder="description"
+              multiline={true}
+              value={this.state.description}
+              style={styles.text}
+              onChangeText={description => {
+                console.log(description);
+                this.setState({description});
+              }}
+            />
+            <TextInput
+              placeholder="tags"
+              multiline={true}
+              value={this.state.tagsText}
+              style={styles.text}
+              onChangeText={tagsText => {
+                console.log(tagsText);
+                this.setState({tagsText});
+              }}
+            />
           </View>
           <View style={styles.buttonsContainer}>
             <Icon
               name="trash"
               onPress={this._onPressTrash}
+              size={45}
+              style={styles.icon}
+            />
+            <Icon
+              name="pencil"
+              onPress={this._onPressSave}
               size={45}
               style={styles.icon}
             />
@@ -133,9 +186,11 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
   },
   buttonsContainer: {
-    justifyContent: 'center',
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
     height: 80,
-    paddingLeft: 50,
   },
   exitButton: {
     color: '#595959',

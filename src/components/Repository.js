@@ -132,6 +132,14 @@ class Repository {
       .catch(err => console.error(err));
   }
 
+  updateImage(id, description, tags) {
+    return this._executeSql(`
+      UPDATE \`tb_images\`
+      SET description="${description}", tags="${tags.join(',')}"
+      WHERE id=${id}
+    `);
+  }
+
   removeImage(id) {
     console.log(`Removing image with id: ${id}`);
 
@@ -146,6 +154,7 @@ class Repository {
       var rows = [];
       for (var i = 0; i < res.rows.length; i++) {
         var row = res.rows.item(i);
+        row.tags = row.tags.split(',');
         rows.push(row);
       }
       return rows;
