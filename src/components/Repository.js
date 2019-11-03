@@ -1,4 +1,6 @@
 import SQLite from 'react-native-sqlite-storage';
+import ImageResizer from 'react-native-image-resizer';
+import RNFS from 'react-native-fs';
 
 class Repository {
   constructor() {
@@ -41,6 +43,10 @@ class Repository {
     this._createTable()
       .then(() => console.log('Table Created!'))
       .catch(e => console.error(e));
+
+    RNFS.mkdir(`${RNFS.DocumentDirectoryPath}/images`).then(() =>
+      console.log('images folder created!'),
+    );
     // );
   }
 
@@ -56,7 +62,7 @@ class Repository {
       .then(
         reflect(
           this._executeSql(
-            'ALTER TABLE tb_images ADD COLUMN thumbnail VARCHAR(200000) DEFAULT ""',
+            'ALTER TABLE tb_images ADD COLUMN thumbnailUri VARCHAR(300) DEFAULT ""',
           ),
         ),
       )
@@ -94,11 +100,25 @@ class Repository {
   }
 
   addImage(image) {
-    return this._executeSql(`
+    return ImageResizer.createResizedImage(
+      image.uri,
+      200,
+      200,
+      'PNG',
+      100,
+      0,
+      `${RNFS.DocumentDirectoryPath}/images`,
+    )
+      .then(response => {
+        console.log(`Image resized: ${JSON.stringify(response)}`);
+        return this._executeSql(`
           INSERT INTO \`tb_images\`
-          (uri,width,height) 
-          VALUES ("${image.uri}",${image.width},${image.height})
-    `);
+          (thumbnailUri,uri,width,height) 
+          VALUES 
+          ("${response.uri}","${image.uri}",${image.width},${image.height})
+        `);
+      })
+      .catch(err => console.error(err));
   }
 
   removeImage(id) {

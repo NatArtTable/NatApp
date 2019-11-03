@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, BackHandler, Alert} from 'react-native';
+import {View, StyleSheet, BackHandler} from 'react-native';
 import ActionsBar from '../components/ActionsBar';
 import SearchForm from '../components/SearchForm';
 import ArtRefsViewer from '../components/ArtRefsViewer';
@@ -85,24 +85,6 @@ export default class HomeScreen extends React.Component {
     repository.addImage(image).then(() => this.research());
   }
 
-  removeImage(image) {
-    Alert.alert(
-      'Remove',
-      'You are sure you want to remove this image from your library?',
-      [
-        {
-          text: 'Do It!',
-          onPress: () => {
-            console.log(`Removendo Imagem! id: ${image.id}`);
-            repository.removeImage(image.id).then(() => this.research());
-            this._artRefViewer.close();
-          },
-        },
-        {text: 'Cancel', onPress: () => console.log('Cancel Pressed')},
-      ],
-    );
-  }
-
   render() {
     if (this.state.numberOfTimesBackButtonPressed >= 2) {
       BackHandler.exitApp();
@@ -137,7 +119,7 @@ export default class HomeScreen extends React.Component {
           ref={viewer => {
             this._artRefViewer = viewer;
           }}
-          onPressThrash={item => this.removeImage(item)}
+          reload={this.research}
         />
       </View>
     );

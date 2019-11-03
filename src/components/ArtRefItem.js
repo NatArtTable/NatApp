@@ -1,5 +1,6 @@
 import React from 'react';
-import {StyleSheet, Image, TouchableOpacity} from 'react-native';
+import {StyleSheet, TouchableOpacity} from 'react-native';
+import ImageViewer from './ImageViewer';
 
 export default class ArtRefItem extends React.Component {
   constructor(props) {
@@ -14,9 +15,9 @@ export default class ArtRefItem extends React.Component {
         onPress={this.props.onPress}
         style={itemSyle}
         key={this.props.id}>
-        <Image
+        <ImageViewer
           style={styles.image}
-          source={{uri: this.props.uri}}
+          source={{thumbnailUri: this.props.thumbnailUri, uri: this.props.uri}}
           resizeMode="contain"
         />
       </TouchableOpacity>
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    borderRadius: 20,
+    borderRadius: 2,
     width: '98%',
     height: '98%',
   },

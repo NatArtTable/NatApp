@@ -65,7 +65,5 @@ export default class ArtRefsViewer extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#f2f2f2',
-  },
+  container: {},
 });

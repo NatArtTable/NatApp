@@ -1,6 +1,8 @@
 import React from 'react';
-import {StyleSheet, Image, View, ScrollView} from 'react-native';
+import {StyleSheet, View, ScrollView, Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/EvilIcons';
+import repository from './Repository';
+import ImageViewer from './ImageViewer';
 
 export default class ArtRefViewer extends React.Component {
   constructor(props) {
@@ -14,6 +16,7 @@ export default class ArtRefViewer extends React.Component {
     this.show = this.show.bind(this);
     this.close = this.close.bind(this);
     this.render = this.render.bind(this);
+    this._onPressTrash = this._onPressTrash.bind(this);
   }
 
   show(image) {
@@ -30,6 +33,26 @@ export default class ArtRefViewer extends React.Component {
     this.setState({visible: false});
   }
 
+  _onPressTrash() {
+    Alert.alert(
+      'Remove',
+      'You are sure you want to remove this image from your library?',
+      [
+        {
+          text: 'Do It!',
+          onPress: () => {
+            console.log(`Removendo Imagem! id: ${this.state.image.id}`);
+            repository
+              .removeImage(this.state.image.id)
+              .then(() => this.props.reload());
+            this.close();
+          },
+        },
+        {text: 'Cancel', onPress: () => console.log('Cancel Pressed')},
+      ],
+    );
+  }
+
   render() {
     const imageStyle = {
       ...styles.image,
@@ -40,15 +63,18 @@ export default class ArtRefViewer extends React.Component {
     return this.state.visible ? (
       <View style={styles.container}>
         <ScrollView>
-          <Image
+          <ImageViewer
             style={imageStyle}
-            source={{uri: this.state.image.uri}}
+            source={{
+              thumbnailUri: this.state.image.thumbnailUri,
+              uri: this.state.image.uri,
+            }}
             resizeMode="contain"
           />
           <View style={styles.buttonsContainer}>
             <Icon
               name="trash"
-              onPress={() => this.props.onPressThrash(this.state.image)}
+              onPress={this._onPressTrash}
               size={45}
               style={styles.icon}
             />
@@ -80,7 +106,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   image: {
-    borderRadius: 20,
+    borderRadius: 2,
   },
   exitButtonContainer: {
     position: 'absolute',
@@ -92,7 +118,6 @@ const styles = StyleSheet.create({
     height: 50,
   },
   exitButton: {
-    // backgroundColor: 'white',
     color: '#595959',
     borderRadius: 200,
   },
