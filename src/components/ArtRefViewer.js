@@ -1,7 +1,6 @@
 import React from 'react';
 import {StyleSheet, Image, View, ScrollView} from 'react-native';
 import Icon from 'react-native-vector-icons/EvilIcons';
-import repository from './Repository';
 
 export default class ArtRefViewer extends React.Component {
   constructor(props) {

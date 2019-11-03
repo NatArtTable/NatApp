@@ -20,7 +20,7 @@ class Column extends React.Component {
     ));
 
     return (
-      <View style={{flex: 1}} data={this.props.data}>
+      <View style={styles.column} data={this.props.data}>
         {items}
       </View>
     );
@@ -93,4 +93,5 @@ export default class Masonry extends React.Component {
 
 const styles = StyleSheet.create({
   container: {flexDirection: 'row'},
+  column: {flex: 1},
 });
