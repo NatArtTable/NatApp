@@ -15,20 +15,30 @@ export default class ImageScreen extends React.Component {
     super(props);
 
     this.state = {
-      tags: [],
+      tags: '',
       description: '',
+      submitted: false,
     };
 
     this._onFormSubmit = this._onFormSubmit.bind(this);
   }
 
   _onFormSubmit() {
+    if (this.state.submitted) {
+      return;
+    }
+
+    this.setState({submitted: true});
+
     const image = {...this.props.navigation.getParam('image', {})};
 
     console.log(`Adding ArtRef! uri: ${image.uri}`);
 
     image.description = this.state.description;
-    image.tags = this.state.tags;
+    image.tags = this.state.tags
+      .split(/[.,\s]/)
+      .map(tag => tag.trim().toLowerCase())
+      .filter(tag => tag.length > 0);
 
     repository.addImage(image).then(() => this.props.navigation.goBack());
   }
@@ -68,11 +78,9 @@ export default class ImageScreen extends React.Component {
             <TextInput
               placeholder="tags"
               style={styles.textInput}
-              value={this.state.tags.join(', ')}
-              onChangeText={text => {
-                this.setState({
-                  tags: text.split(',').map(tag => tag.trim().toLowerCase()),
-                });
+              value={this.state.tags}
+              onChangeText={tags => {
+                this.setState({tags});
               }}
             />
 
