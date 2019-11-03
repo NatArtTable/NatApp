@@ -161,7 +161,8 @@ const styles = StyleSheet.create({
     width: '90%',
     height: '90%',
     backgroundColor: 'white',
-    borderRadius: 50,
+    borderWidth: 0.3,
+    borderColor: 'gray',
   },
   image: {
     borderRadius: 2,

@@ -57,7 +57,7 @@ export default class ActionsBar extends React.Component {
       <View>
         {this._renderButton('plus', this._onToggleButtonPressed, {
           color: 'white',
-          backgroundColor: '#1f7a1f',
+          backgroundColor: '#e324a7',
         })}
       </View>
     );

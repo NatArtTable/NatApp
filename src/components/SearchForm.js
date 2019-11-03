@@ -29,8 +29,10 @@ export default class SearchForm extends React.Component {
     return (
       <View>
         <SearchBar
+          containerStyle={styles.containerSearchBar}
+          inputStyle={styles.searchBar}
+          inputContainerStyle={styles.searchBar}
           placeholder="search"
-          style={styles.input}
           onChangeText={this._handleChangeText}
           value={this.state.query.text}
         />
@@ -41,4 +43,8 @@ export default class SearchForm extends React.Component {
 
 const styles = StyleSheet.create({
   container: {},
+  searchBar: {backgroundColor: '#ffdbfa'},
+  containerSearchBar: {
+    backgroundColor: '#e324a7',
+  },
 });
