@@ -3,6 +3,7 @@ import {StyleSheet, View, ScrollView, Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/EvilIcons';
 import repository from './Repository';
 import ImageViewer from './ImageViewer';
+import {Text} from 'react-native-elements';
 
 export default class ArtRefViewer extends React.Component {
   constructor(props) {
@@ -71,6 +72,10 @@ export default class ArtRefViewer extends React.Component {
             }}
             resizeMode="contain"
           />
+          <View style={styles.infoContainer}>
+            <Text style={styles.text}>{this.state.image.description}</Text>
+            <Text style={styles.text}>{this.state.image.tags}</Text>
+          </View>
           <View style={styles.buttonsContainer}>
             <Icon
               name="trash"
@@ -114,8 +119,23 @@ const styles = StyleSheet.create({
     top: 10,
   },
   icon: {},
+  infoContainer: {
+    marginTop: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 20,
+    margin: 10,
+    width: '80%',
+    height: 80,
+    borderWidth: 0.5,
+    borderColor: 'gray',
+  },
   buttonsContainer: {
-    height: 50,
+    justifyContent: 'center',
+    height: 80,
+    paddingLeft: 50,
   },
   exitButton: {
     color: '#595959',

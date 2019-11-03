@@ -121,9 +121,11 @@ class Repository {
         return this._executeSql(`
           INSERT INTO \`tb_images\`
           (thumbnailUri,uri,original_uri,
+            description,tags,
             width,height) 
           VALUES 
           ("${response.uri}","${image.uri}","${image.uri}",
+          "${image.description}","${image.tags.join(',')}",
           ${image.width},${image.height})
         `);
       })

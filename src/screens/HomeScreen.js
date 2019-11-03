@@ -1,12 +1,16 @@
 import React from 'react';
 import {View, StyleSheet, BackHandler} from 'react-native';
+import {withNavigationFocus} from 'react-navigation';
+
 import ActionsBar from '../components/ActionsBar';
 import SearchForm from '../components/SearchForm';
+
 import ArtRefsViewer from '../components/ArtRefsViewer';
 import ArtRefViewer from '../components/ArtRefViewer';
+
 import repository from '../components/Repository';
 
-export default class HomeScreen extends React.Component {
+class HomeScreen extends React.Component {
   static navigationOptions = {
     title: 'Home',
     header: null,
@@ -36,6 +40,13 @@ export default class HomeScreen extends React.Component {
 
   componentDidMount() {
     this.research();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.isFocused !== this.props.isFocused) {
+      console.log('Tab refocused. Redoing search...');
+      this.research();
+    }
   }
 
   research() {
@@ -80,9 +91,7 @@ export default class HomeScreen extends React.Component {
   }
 
   addImage(image) {
-    console.log(`Imagem adicionada! uri: ${image.uri}`);
-
-    repository.addImage(image).then(() => this.research());
+    this.props.navigation.push('Image', {image});
   }
 
   render() {
@@ -141,3 +150,5 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
+
+export default withNavigationFocus(HomeScreen);

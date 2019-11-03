@@ -3,10 +3,10 @@ import {Image} from 'react-native';
 
 import ShareMenu from 'react-native-share-menu';
 
-import {createAppContainer} from 'react-navigation';
+import {createAppContainer, NavigationActions} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 
-import AddImageScreen from './screens/AddImageScreen';
+import ImageScreen from './screens/ImageScreen';
 import HomeScreen from './screens/HomeScreen';
 
 import repository from './components/Repository';
@@ -17,7 +17,7 @@ export default class App extends React.Component {
 
     this._MainNavigator = createStackNavigator({
       Home: {screen: HomeScreen},
-      AddImage: {screen: AddImageScreen},
+      Image: {screen: ImageScreen},
     });
 
     this._AppContainer = createAppContainer(this._MainNavigator);
@@ -25,16 +25,32 @@ export default class App extends React.Component {
 
   componentDidMount() {
     ShareMenu.getSharedText(image => {
+      ShareMenu.clearSharedText();
+
       console.log(`Adding image shared. Uri: ${image}`);
-      Image.getSize(image, (width, height) => {
-        repository.addImage({uri: image, width, height}).then(() => {
-          ShareMenu.clearSharedText();
-        });
-      });
+      Image.getSize(
+        image,
+        (width, height) => {
+          this._navigator.dispatch(
+            NavigationActions.navigate({
+              routeName: 'Image',
+              action: 'push',
+              params: {image: {uri: image, width, height}},
+            }),
+          );
+        },
+        err => console.error(err),
+      );
     });
   }
 
   render() {
-    return <this._AppContainer />;
+    return (
+      <this._AppContainer
+        ref={nav => {
+          this._navigator = nav;
+        }}
+      />
+    );
   }
 }
