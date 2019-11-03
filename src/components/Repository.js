@@ -43,11 +43,11 @@ class Repository {
     this._createTable()
       .then(() => console.log('Table Created!'))
       .catch(e => console.error(e));
+    // );
 
     RNFS.mkdir(`${RNFS.DocumentDirectoryPath}/images`).then(() =>
       console.log('images folder created!'),
     );
-    // );
   }
 
   _createTable() {
@@ -63,6 +63,13 @@ class Repository {
         reflect(
           this._executeSql(
             'ALTER TABLE tb_images ADD COLUMN thumbnailUri VARCHAR(300) DEFAULT ""',
+          ),
+        ),
+      )
+      .then(
+        reflect(
+          this._executeSql(
+            'ALTER TABLE tb_images ADD COLUMN original_uri VARCHAR(300)',
           ),
         ),
       )
@@ -113,9 +120,11 @@ class Repository {
         console.log(`Image resized: ${JSON.stringify(response)}`);
         return this._executeSql(`
           INSERT INTO \`tb_images\`
-          (thumbnailUri,uri,width,height) 
+          (thumbnailUri,uri,original_uri,
+            width,height) 
           VALUES 
-          ("${response.uri}","${image.uri}",${image.width},${image.height})
+          ("${response.uri}","${image.uri}","${image.uri}",
+          ${image.width},${image.height})
         `);
       })
       .catch(err => console.error(err));

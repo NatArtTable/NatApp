@@ -1,9 +1,9 @@
 import React from 'react';
 import {View, Text} from 'react-native';
 
-export default class LoginScreen extends React.Component {
+export default class AddImageScreen extends React.Component {
   static navigationOptions = {
-    title: 'Login',
+    title: 'New Art Reference',
   };
 
   constructor(props) {
@@ -13,7 +13,7 @@ export default class LoginScreen extends React.Component {
   render() {
     return (
       <View>
-        <Text>Tela de Login</Text>
+        <Text>Oxe mainha!</Text>
       </View>
     );
   }
