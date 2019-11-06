@@ -147,9 +147,11 @@ class Repository {
   }
 
   search(query) {
+    const text = query.text.trim().toLowerCase();
+
     return this._executeSql(
       `SELECT * FROM tb_images 
-       WHERE description || ' ' || tags LIKE '%${query.text}%'`,
+       WHERE description || ' ' || tags LIKE '%${text}%'`,
     ).then(res => {
       var rows = [];
       for (var i = 0; i < res.rows.length; i++) {
