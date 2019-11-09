@@ -9,6 +9,7 @@ class Repository {
     this.search = this.search.bind(this);
     this.removeImage = this.removeImage.bind(this);
     this.thumbnailPath = `${RNFS.DocumentDirectoryPath}/images`;
+    this.suggestFolder = this.suggestFolder.bind(this);
 
     this.db = SQLite.openDatabase(
       'repository.db',
@@ -156,6 +157,19 @@ class Repository {
       folder="${folder}" 
       WHERE id=${id}
     `);
+  }
+
+  suggestFolder(query) {
+    return this._executeSql(
+      `SELECT DISTINCT \`folder\` FROM \`tb_images\` WHERE \`folder\` LIKE "%${query}%"`,
+    ).then(res => {
+      var rows = [];
+      for (var i = 0; i < res.rows.length; i++) {
+        var row = res.rows.item(i);
+        rows.push(row.folder);
+      }
+      return rows;
+    });
   }
 
   removeImage(id) {

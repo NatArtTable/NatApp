@@ -6,8 +6,10 @@ import ShareMenu from 'react-native-share-menu';
 import {createAppContainer, NavigationActions} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 
-import AddImageScreen from './screens/AddImageScreen';
+import ImageScreen from './screens/ImageScreen';
 import HomeScreen from './screens/HomeScreen';
+
+console.disableYellowBox = true;
 
 export default class App extends React.Component {
   constructor(props) {
@@ -15,7 +17,7 @@ export default class App extends React.Component {
 
     this._MainNavigator = createStackNavigator({
       Home: {screen: HomeScreen},
-      AddImage: {screen: AddImageScreen},
+      Image: {screen: ImageScreen},
     });
 
     this._AppContainer = createAppContainer(this._MainNavigator);
@@ -31,9 +33,9 @@ export default class App extends React.Component {
         (width, height) => {
           this._navigator.dispatch(
             NavigationActions.navigate({
-              routeName: 'AddImage',
+              routeName: 'Image',
               action: 'push',
-              params: {image: {uri: image, width, height}},
+              params: {mode: 'add', image: {uri: image, width, height}},
             }),
           );
         },

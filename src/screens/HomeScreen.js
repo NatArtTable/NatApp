@@ -6,7 +6,6 @@ import ActionsBar from '../components/ActionsBar';
 import SearchForm from '../components/SearchForm';
 
 import ArtRefsViewer from '../components/ArtRefsViewer';
-import ArtRefViewer from '../components/ArtRefViewer';
 
 import repository from '../components/Repository';
 
@@ -56,11 +55,6 @@ class HomeScreen extends React.Component {
   _handleBackPress() {
     console.log('HomeScreen _handleBackPress Called!');
 
-    if (this._artRefViewer.isVisible()) {
-      this._artRefViewer.close();
-      this.setState({numberOfTimesBackButtonPressed: 0});
-    }
-
     if (this._actionsBar.isToggled()) {
       this._actionsBar.untoggle();
       this.setState({numberOfTimesBackButtonPressed: 0});
@@ -86,12 +80,12 @@ class HomeScreen extends React.Component {
   }
 
   onItemPressed(item) {
-    this._artRefViewer.show(item);
+    this.props.navigation.push('Image', {image: item, mode: 'edit'});
     return true;
   }
 
   addImage(image) {
-    this.props.navigation.push('AddImage', {image});
+    this.props.navigation.push('Image', {image, mode: 'add'});
   }
 
   render() {
@@ -124,12 +118,6 @@ class HomeScreen extends React.Component {
             }}
           />
         </View>
-        <ArtRefViewer
-          ref={viewer => {
-            this._artRefViewer = viewer;
-          }}
-          reload={this.research}
-        />
       </View>
     );
   }
