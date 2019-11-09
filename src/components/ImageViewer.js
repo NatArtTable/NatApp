@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, Image, View} from 'react-native';
+import {StyleSheet, Image, Text, View} from 'react-native';
 
 export default class ImageViewer extends React.Component {
   constructor(props) {
@@ -21,6 +21,9 @@ export default class ImageViewer extends React.Component {
           source={{uri: this.props.source.uri}}
           resizeMode="contain"
         />
+        <View style={styles.labelContainer}>
+          <Text style={styles.textLabel}>{this.props.label}</Text>
+        </View>
       </View>
     );
   }
@@ -40,5 +43,18 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: '#e1e4e8',
+  },
+  labelContainer: {
+    position: 'absolute',
+    right: 10,
+    bottom: 10,
+    backgroundColor: '#3ca897',
+    paddingHorizontal: 4,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  textLabel: {
+    fontSize: 12,
+    color: 'white',
   },
 });

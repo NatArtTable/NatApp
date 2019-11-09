@@ -16,6 +16,7 @@ export default class ArtRefItem extends React.Component {
         style={itemSyle}
         key={this.props.id}>
         <ImageViewer
+          label={this.props.folder}
           style={styles.image}
           source={{
             thumbnail_uri: this.props.thumbnail_uri,
