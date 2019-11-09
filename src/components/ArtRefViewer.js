@@ -3,6 +3,7 @@ import {StyleSheet, TextInput, View, ScrollView, Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/EvilIcons';
 import repository from './Repository';
 import ImageViewer from './ImageViewer';
+import ArtRefMetadatForm from './ArtRefMetadataForm';
 
 export default class ArtRefViewer extends React.Component {
   constructor(props) {
@@ -26,7 +27,7 @@ export default class ArtRefViewer extends React.Component {
       visible: true,
       image,
       description: image.description,
-      tagsText: image.tags.join(', '),
+      tags: image.tags,
     });
   }
 
@@ -40,20 +41,17 @@ export default class ArtRefViewer extends React.Component {
   }
 
   _onPressSave() {
-    const tags = this.state.tagsText
-      .split(/[.,\s]+/)
-      .map(tag => tag.trim().toLowerCase())
-      .filter(tag => tag.length > 0);
-
-    const description = this.state.description;
-
     Alert.alert('Edit', 'You are sure you want to save your changes?', [
       {
         text: 'Do It!',
         onPress: () => {
           console.log(`Altering image! id: ${this.state.image.id}`);
           repository
-            .updateImage(this.state.image.id, description, tags)
+            .updateImage(
+              this.state.image.id,
+              this.state.description,
+              this.state.tags,
+            )
             .then(() => this.props.reload())
             .catch(e => console.error(e));
           this.close();
@@ -101,25 +99,15 @@ export default class ArtRefViewer extends React.Component {
             }}
             resizeMode="contain"
           />
-          <View style={styles.infoContainer}>
-            <TextInput
-              placeholder="description"
-              multiline={true}
-              value={this.state.description}
-              style={styles.text}
-              onChangeText={description => {
-                console.log(description);
-                this.setState({description});
+          <View style={styles.formContainer}>
+            <ArtRefMetadatForm
+              containerStyle={styles.form}
+              data={{
+                description: this.state.description,
+                tags: this.state.tags,
               }}
-            />
-            <TextInput
-              placeholder="tags"
-              multiline={true}
-              value={this.state.tagsText}
-              style={styles.text}
-              onChangeText={tagsText => {
-                console.log(tagsText);
-                this.setState({tagsText});
+              onChangeData={data => {
+                this.setState({description: data.description, tags: data.tags});
               }}
             />
           </View>
@@ -171,6 +159,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 10,
     top: 10,
+  },
+  form: {
+    flex: 1,
+  },
+  formContainer: {
+    flex: 1,
+    padding: 10,
+    alignContent: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#e6b1de',
   },
   icon: {},
   infoContainer: {

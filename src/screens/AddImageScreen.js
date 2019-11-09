@@ -1,9 +1,9 @@
 import React from 'react';
-import {StyleSheet, ScrollView, View, TextInput} from 'react-native';
+import {StyleSheet, ScrollView, View} from 'react-native';
 import Icon from 'react-native-vector-icons/EvilIcons';
 
 import ImageViewer from '../components/ImageViewer';
-
+import ArtRefMetadataForm from '../components/ArtRefMetadataForm';
 import repository from '../components/Repository';
 
 export default class AddImageScreen extends React.Component {
@@ -15,7 +15,7 @@ export default class AddImageScreen extends React.Component {
     super(props);
 
     this.state = {
-      tags: '',
+      tags: [],
       description: '',
       submitted: false,
     };
@@ -35,10 +35,7 @@ export default class AddImageScreen extends React.Component {
     console.log(`Adding ArtRef! uri: ${image.uri}`);
 
     image.description = this.state.description;
-    image.tags = this.state.tags
-      .split(/[.,\s]/)
-      .map(tag => tag.trim().toLowerCase())
-      .filter(tag => tag.length > 0);
+    image.tags = this.state.tags;
 
     repository.addImage(image).then(() => this.props.navigation.goBack());
   }
@@ -66,24 +63,18 @@ export default class AddImageScreen extends React.Component {
             resizeMode="contain"
           />
           <View style={styles.formContainer}>
-            <TextInput
-              placeholder="description"
-              multiline={true}
-              style={styles.textInput}
-              value={this.state.description}
-              onChangeText={description => {
-                this.setState({description});
+            <ArtRefMetadataForm
+              containerStyle={styles.form}
+              data={{
+                description: this.state.description,
+                tags: this.state.tags,
+              }}
+              onChangeData={data => {
+                this.setState({description: data.description, tags: data.tags});
               }}
             />
-            <TextInput
-              placeholder="tags"
-              style={styles.textInput}
-              value={this.state.tags}
-              onChangeText={tags => {
-                this.setState({tags});
-              }}
-            />
-
+          </View>
+          <View style={styles.buttonsContainer}>
             <Icon
               name="check"
               onPress={this._onFormSubmit}
@@ -112,11 +103,25 @@ const styles = StyleSheet.create({
     width: '90%',
     margin: 15,
   },
-  icon: {},
-  formContainer: {
-    alignItems: 'center',
+  icon: {
+    color: '#595959',
+    borderRadius: 200,
+  },
+  form: {
     flex: 1,
-    marginTop: 20,
-    paddingBottom: 20,
+  },
+  formContainer: {
+    flex: 1,
+    padding: 10,
+    alignContent: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#e6b1de',
+  },
+  buttonsContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    height: 80,
   },
 });
