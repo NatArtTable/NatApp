@@ -85,7 +85,7 @@ export default class Masonry extends React.Component {
             );
           })}
         </View>
-        {this.props.footer}
+        <View style={styles.footer} />
       </ScrollView>
     );
   }
@@ -94,4 +94,8 @@ export default class Masonry extends React.Component {
 const styles = StyleSheet.create({
   container: {flexDirection: 'row'},
   column: {flex: 1},
+  footer: {
+    height: 100,
+    width: '100%',
+  },
 });

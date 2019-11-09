@@ -17,7 +17,10 @@ export default class ArtRefItem extends React.Component {
         key={this.props.id}>
         <ImageViewer
           style={styles.image}
-          source={{thumbnailUri: this.props.thumbnailUri, uri: this.props.uri}}
+          source={{
+            thumbnail_uri: this.props.thumbnail_uri,
+            uri: this.props.uri,
+          }}
           resizeMode="contain"
         />
       </TouchableOpacity>

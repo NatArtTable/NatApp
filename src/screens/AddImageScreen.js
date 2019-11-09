@@ -16,6 +16,7 @@ export default class AddImageScreen extends React.Component {
 
     this.state = {
       tags: [],
+      folder: '',
       description: '',
       submitted: false,
     };
@@ -36,8 +37,18 @@ export default class AddImageScreen extends React.Component {
 
     image.description = this.state.description;
     image.tags = this.state.tags;
+    image.folder = this.state.folder;
 
-    repository.addImage(image).then(() => this.props.navigation.goBack());
+    repository
+      .addImage(
+        image.uri,
+        image.width,
+        image.height,
+        image.description,
+        image.tags,
+        image.folder,
+      )
+      .then(() => this.props.navigation.goBack());
   }
 
   render() {
@@ -57,7 +68,7 @@ export default class AddImageScreen extends React.Component {
           <ImageViewer
             style={imageStyle}
             source={{
-              thumbnailUri: image.thumbnailUri,
+              thumbnail_uri: image.thumbnail_uri,
               uri: image.uri,
             }}
             resizeMode="contain"
@@ -68,9 +79,14 @@ export default class AddImageScreen extends React.Component {
               data={{
                 description: this.state.description,
                 tags: this.state.tags,
+                folder: this.state.folder,
               }}
               onChangeData={data => {
-                this.setState({description: data.description, tags: data.tags});
+                this.setState({
+                  folder: data.folder,
+                  description: data.description,
+                  tags: data.tags,
+                });
               }}
             />
           </View>

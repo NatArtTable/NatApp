@@ -13,7 +13,7 @@ export default class ImageViewer extends React.Component {
       <View style={style}>
         <Image
           style={styles.image}
-          source={{uri: this.props.source.thumbnailUri}}
+          source={{uri: this.props.source.thumbnail_uri}}
           resizeMode="contain"
         />
         <Image

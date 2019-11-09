@@ -26,8 +26,6 @@ export default class ArtRefViewer extends React.Component {
     this.setState({
       visible: true,
       image,
-      description: image.description,
-      tags: image.tags,
     });
   }
 
@@ -46,11 +44,13 @@ export default class ArtRefViewer extends React.Component {
         text: 'Do It!',
         onPress: () => {
           console.log(`Altering image! id: ${this.state.image.id}`);
+
           repository
             .updateImage(
               this.state.image.id,
-              this.state.description,
-              this.state.tags,
+              this.state.image.description,
+              this.state.image.tags,
+              this.state.image.folder,
             )
             .then(() => this.props.reload())
             .catch(e => console.error(e));
@@ -94,7 +94,7 @@ export default class ArtRefViewer extends React.Component {
           <ImageViewer
             style={imageStyle}
             source={{
-              thumbnailUri: this.state.image.thumbnailUri,
+              thumbnail_uri: this.state.image.thumbnail_uri,
               uri: this.state.image.uri,
             }}
             resizeMode="contain"
@@ -103,11 +103,17 @@ export default class ArtRefViewer extends React.Component {
             <ArtRefMetadatForm
               containerStyle={styles.form}
               data={{
-                description: this.state.description,
-                tags: this.state.tags,
+                description: this.state.image.description,
+                tags: this.state.image.tags,
+                folder: this.state.image.folder,
               }}
               onChangeData={data => {
-                this.setState({description: data.description, tags: data.tags});
+                var image = Object.assign({}, this.state.image);
+                image.description = data.description;
+                image.tags = data.tags;
+                image.folder = data.folder;
+
+                this.setState({image});
               }}
             />
           </View>
