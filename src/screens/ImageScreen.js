@@ -3,7 +3,6 @@ import {Alert, StyleSheet, ScrollView, View} from 'react-native';
 import Icon from 'react-native-vector-icons/EvilIcons';
 import {withNavigationFocus} from 'react-navigation';
 
-import ImageViewer from '../components/ImageViewer';
 import ArtRefMetadataForm from '../components/ArtRefMetadataForm';
 import repository from '../components/Repository';
 
@@ -133,32 +132,13 @@ class ImageScreen extends React.Component {
   render() {
     const image = this.state.image;
 
-    const imageStyle = {
-      ...styles.image,
-      width: '100%',
-      aspectRatio: image.width / image.height,
-    };
-
     return (
       <View style={styles.container}>
         <ScrollView>
-          <ImageViewer
-            style={imageStyle}
-            source={{
-              thumbnail_uri: image.thumbnail_uri,
-              uri: image.uri,
-            }}
-            resizeMode="contain"
-            label={image.folder}
-          />
           <View style={styles.formContainer}>
             <ArtRefMetadataForm
               containerStyle={styles.form}
-              data={{
-                description: image.description,
-                tags: image.tags,
-                folder: image.folder,
-              }}
+              data={image}
               onChangeData={data => {
                 this.setState({image: Object.assign(this.state.image, data)});
               }}
@@ -220,6 +200,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   formContainer: {
+    zIndex: 2,
     flex: 1,
     padding: 10,
     alignContent: 'center',
