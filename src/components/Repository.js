@@ -1,6 +1,7 @@
 import SQLite from 'react-native-sqlite-storage';
 import ImageResizer from 'react-native-image-resizer';
 import RNFS from 'react-native-fs';
+import {AsyncStorage} from 'react-native';
 
 class Repository {
   constructor() {
@@ -13,6 +14,7 @@ class Repository {
     this.suggestFolder = this.suggestFolder.bind(this);
     this._createTables = this._createTables.bind(this);
     this._createFolderIfNotExists = this._createFolderIfNotExists.bind(this);
+    this.login = this.login.bind(this);
 
     this.db = SQLite.openDatabase(
       'repository.db',
@@ -22,6 +24,19 @@ class Repository {
       this._openCB,
       this._errorCB,
     );
+  }
+
+  async login(email, password) {
+    await AsyncStorage.setItem('token', 'I like to save it.');
+  }
+
+  async isLogged() {
+    const token = await AsyncStorage.getItem('token');
+    if (token === null) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   _executeSql(query) {

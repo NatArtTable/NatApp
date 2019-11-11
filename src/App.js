@@ -8,6 +8,7 @@ import {createStackNavigator} from 'react-navigation-stack';
 
 import ImageScreen from './screens/ImageScreen';
 import HomeScreen from './screens/HomeScreen';
+import LoginScreen from './screens/LoginScreen';
 
 console.disableYellowBox = true;
 
@@ -16,6 +17,7 @@ export default class App extends React.Component {
     super(props);
 
     this._MainNavigator = createStackNavigator({
+      Login: {screen: LoginScreen},
       Home: {screen: HomeScreen},
       Image: {screen: ImageScreen},
     });
