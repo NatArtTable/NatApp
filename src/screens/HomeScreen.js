@@ -6,7 +6,7 @@ import ActionsBar from '../components/ActionsBar';
 import SearchForm from '../components/SearchForm';
 
 import ArtRefsViewer from '../components/ArtRefsViewer';
-
+import SideMenu from '../components/SideMenu';
 import repository from '../components/Repository';
 import Loading from '../components/Loading';
 
@@ -47,6 +47,10 @@ class HomeScreen extends React.Component {
   }
 
   _onFocus() {
+    this.search();
+  }
+
+  componentDidMount() {
     this.search();
   }
 
@@ -100,12 +104,17 @@ class HomeScreen extends React.Component {
         />
         <View style={styles.actionsBarContainer}>
           <ActionsBar
+            onBarsPressed={() => this.setState({sidemenu: true})}
             onAddImage={this.addImage}
             ref={bar => {
               this._actionsBar = bar;
             }}
           />
         </View>
+        <SideMenu
+          on={this.state.sidemenu}
+          onClickedOutOfMenu={() => this.setState({sidemenu: false})}
+        />
         <Loading on={this.state.loading} />
       </View>
     );
@@ -118,9 +127,10 @@ const styles = StyleSheet.create({
   },
 
   actionsBarContainer: {
+    width: '100%',
     position: 'absolute',
-    bottom: 10,
-    right: 20,
+    bottom: 20,
+    right: 0,
   },
 
   searchBarContainer: {

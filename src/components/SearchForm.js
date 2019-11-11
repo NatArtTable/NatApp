@@ -27,7 +27,7 @@ export default class SearchForm extends React.Component {
 
   render() {
     return (
-      <View>
+      <View style={this.props.containerStyle}>
         <SearchBar
           containerStyle={styles.containerSearchBar}
           inputStyle={styles.searchBar}
@@ -42,7 +42,6 @@ export default class SearchForm extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  container: {},
   searchBar: {backgroundColor: '#ffdbfa'},
   containerSearchBar: {
     backgroundColor: '#e324a7',
