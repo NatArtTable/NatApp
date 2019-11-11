@@ -69,14 +69,23 @@ export default class ArtRefMetadataForm extends React.Component {
   }
 
   _getFolderSuggestion() {
+    console.log('Recalculating folder suggestion');
     repository.suggestFolder('').then(res => {
       this.setState({folderSuggestion: res});
     });
   }
 
-  render() {
-    this._getFolderSuggestion();
+  componentDidUpdate(prevPros) {
+    if (prevPros.data.folder !== this.props.data.folder) {
+      this._getFolderSuggestion();
+    }
+  }
 
+  componentDidMount() {
+    this._getFolderSuggestion();
+  }
+
+  render() {
     const imageStyle = {
       ...styles.image,
       width: '50%',
@@ -156,8 +165,9 @@ export default class ArtRefMetadataForm extends React.Component {
               renderItem={({item, _}) => (
                 <TouchableOpacity
                   onPress={() => {
-                    this.props.data.folder = this._formatFolder(item);
-                    this.props.onChangeData(this.props.data);
+                    const folder = this._formatFolder(item);
+                    const data = Object.assign({}, this.props.data, {folder});
+                    this.props.onChangeData(data);
                     this._unfocusEditFolder();
                   }}
                   style={styles.suggestItem}>
@@ -183,8 +193,11 @@ export default class ArtRefMetadataForm extends React.Component {
                     onBlur={this._unfocusEditFolder}
                     autoCorrect={false}
                     onChangeText={folder => {
-                      this.props.data.folder = this._formatFolder(folder);
-                      this.props.onChangeData(this.props.data);
+                      const fmtFolder = this._formatFolder(folder);
+                      const data = Object.assign({}, this.props.data, {
+                        folder: fmtFolder,
+                      });
+                      this.props.onChangeData(data);
                     }}
                   />
                 </View>
@@ -265,8 +278,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     height: '100%',
-    backgroundColor: 'red',
     position: 'absolute',
+    backgroundColor: '#eee',
     top: 0,
   },
   noMargin: {

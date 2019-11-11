@@ -6,10 +6,13 @@ class Repository {
   constructor() {
     this._openCB = this._openCB.bind(this);
     this._executeSql = this._executeSql.bind(this);
+    this._executeReflectedSql = this._executeReflectedSql.bind(this);
     this.search = this.search.bind(this);
     this.removeImage = this.removeImage.bind(this);
     this.thumbnailPath = `${RNFS.DocumentDirectoryPath}/images`;
     this.suggestFolder = this.suggestFolder.bind(this);
+    this._createTables = this._createTables.bind(this);
+    this._createFolderIfNotExists = this._createFolderIfNotExists.bind(this);
 
     this.db = SQLite.openDatabase(
       'repository.db',
@@ -38,11 +41,18 @@ class Repository {
       );
     });
   }
+
+  _reflect = p => p.then(res => console.log(res), err => console.log(err));
+
+  _executeReflectedSql(query) {
+    return this._reflect(this._executeSql(query));
+  }
+
   _openCB() {
     console.log('Database Opened');
 
     // this._executeSql('DROP TABLE tb_images').then(
-    this._createTable()
+    this._createTables()
       .then(() => console.log('Table Created!'))
       .catch(e => console.error(e));
     // );
@@ -52,63 +62,51 @@ class Repository {
     );
   }
 
-  _createTable() {
-    const reflect = p =>
-      p.then(res => console.log(res), err => console.log(err));
-
-    return reflect(
-      this._executeSql(
-        'CREATE TABLE tb_images(id INTEGER PRIMARY KEY NOT NULL)',
-      ),
+  _createTables() {
+    return this._executeReflectedSql(
+      'CREATE TABLE tb_images(id INTEGER PRIMARY KEY NOT NULL)',
     )
       .then(
-        reflect(
-          this._executeSql(
-            'ALTER TABLE tb_images ADD COLUMN thumbnail_uri VARCHAR(300) DEFAULT ""',
-          ),
+        this._executeReflectedSql(
+          'ALTER TABLE tb_images ADD COLUMN thumbnail_uri VARCHAR(300) DEFAULT ""',
         ),
       )
       .then(
-        reflect(
-          this._executeSql(
-            'ALTER TABLE tb_images ADD COLUMN original_uri VARCHAR(300)',
-          ),
+        this._executeReflectedSql(
+          'ALTER TABLE tb_images ADD COLUMN original_uri VARCHAR(300)',
         ),
       )
       .then(
-        reflect(
-          this._executeSql(
-            'ALTER TABLE tb_images ADD COLUMN public_uri VARCHAR(300)',
-          ),
+        this._executeReflectedSql(
+          'ALTER TABLE tb_images ADD COLUMN public_uri VARCHAR(300)',
         ),
       )
       .then(
-        reflect(
-          this._executeSql(
-            'ALTER TABLE tb_images ADD COLUMN description VARCHAR(1000) DEFAULT ""',
-          ),
+        this._executeReflectedSql(
+          'ALTER TABLE tb_images ADD COLUMN description VARCHAR(1000) DEFAULT ""',
         ),
       )
       .then(
-        reflect(
-          this._executeSql(
-            'ALTER TABLE tb_images ADD COLUMN tags VARCHAR(1000) DEFAULT ""',
-          ),
+        this._executeReflectedSql(
+          'ALTER TABLE tb_images ADD COLUMN tags VARCHAR(1000) DEFAULT ""',
         ),
       )
       .then(
-        reflect(this._executeSql('ALTER TABLE tb_images ADD COLUMN width INT')),
+        this._executeReflectedSql('ALTER TABLE tb_images ADD COLUMN width INT'),
       )
       .then(
-        reflect(
-          this._executeSql('ALTER TABLE tb_images ADD COLUMN height INT'),
+        this._executeReflectedSql(
+          'ALTER TABLE tb_images ADD COLUMN height INT',
         ),
       )
       .then(
-        reflect(
-          this._executeSql(
-            'ALTER TABLE tb_images ADD COLUMN folder VARCHAR(100) DEFAULT ""',
-          ),
+        this._executeReflectedSql(
+          'ALTER TABLE tb_images ADD COLUMN folder VARCHAR(100) DEFAULT ""',
+        ),
+      )
+      .then(
+        this._executeReflectedSql(
+          'CREATE TABLE tb_folders(name VARCHAR(150) PRIMARY KEY NOT NULL)',
         ),
       );
   }
@@ -118,15 +116,18 @@ class Repository {
   }
 
   addImage(uri, width, height, description = '', tags = [], folder = '') {
-    return ImageResizer.createResizedImage(
-      uri,
-      50,
-      50,
-      'PNG',
-      100,
-      0,
-      this.thumbnailPath,
-    )
+    return this._createFolderIfNotExists(folder)
+      .then(
+        ImageResizer.createResizedImage(
+          uri,
+          50,
+          50,
+          'PNG',
+          100,
+          0,
+          this.thumbnailPath,
+        ),
+      )
       .then(response => {
         console.log(`Image resized: ${JSON.stringify(response)}`);
         return this._executeSql(`
@@ -150,26 +151,40 @@ class Repository {
     console.debug(
       `Atualizando artref com id -> ${id} para valores (description, tags, folder) -> (${description},[${tags}],${folder})`,
     );
-    return this._executeSql(`
+    return this._createFolderIfNotExists(folder).then(
+      this._executeSql(`
       UPDATE \`tb_images\`
       SET description="${description}", 
       tags="${tags.join(',')}",
       folder="${folder}" 
       WHERE id=${id}
-    `);
+    `),
+    );
   }
 
   suggestFolder(query) {
     return this._executeSql(
-      `SELECT DISTINCT \`folder\` FROM \`tb_images\` WHERE \`folder\` LIKE "%${query}%"`,
+      `SELECT \`name\` FROM \`tb_folders\` WHERE \`name\` LIKE "%${query}%"`,
     ).then(res => {
       var rows = [];
       for (var i = 0; i < res.rows.length; i++) {
         var row = res.rows.item(i);
-        rows.push(row.folder);
+        rows.push(row.name);
       }
+
       return rows;
     });
+  }
+
+  _createFolderIfNotExists(folder) {
+    if (folder === '') {
+      return new Promise.reject(new Error('Folder cannot be empty'));
+    } else {
+      console.log(`Creating new folder ${folder}`);
+      return this._executeReflectedSql(
+        `INSERT INTO tb_folders (name) VALUES ("${folder}")`,
+      );
+    }
   }
 
   removeImage(id) {

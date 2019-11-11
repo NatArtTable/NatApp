@@ -44,6 +44,7 @@ export default class ImageScreen extends React.Component {
     this._addImage = this._addImage.bind(this);
     this._updateImage = this._updateImage.bind(this);
     this._onPressSave = this._onPressSave.bind(this);
+    this._onPressNew = this._onPressNew.bind(this);
     this._onPressTrash = this._onPressTrash.bind(this);
   }
 
@@ -62,7 +63,10 @@ export default class ImageScreen extends React.Component {
       } else if (action === 'delete') {
         promise = this._deleteImage();
       }
-      promise.then(() => this.props.navigation.goBack());
+      promise
+        .then(() => this.props.navigation.goBack())
+        .catch(err => Alert.alert('Error!', err.message))
+        .finally(() => this.setState({loading: false}));
     });
   }
 
@@ -77,6 +81,23 @@ export default class ImageScreen extends React.Component {
       },
       {text: 'Cancel', onPress: () => console.log('Cancel Pressed')},
     ]);
+  }
+
+  _onPressNew() {
+    Alert.alert(
+      'Save',
+      'You are sure you want add this image to the catalog?',
+      [
+        {
+          text: 'Do It!',
+          onPress: () => {
+            console.log(`Adding new image! id: ${this.state.image.uri}`);
+            this._onFormSubmit();
+          },
+        },
+        {text: 'Cancel', onPress: () => console.log('Cancel Pressed')},
+      ],
+    );
   }
 
   _onPressTrash() {
@@ -139,7 +160,9 @@ export default class ImageScreen extends React.Component {
               containerStyle={styles.form}
               data={image}
               onChangeData={data => {
-                this.setState({image: Object.assign(this.state.image, data)});
+                this.setState({
+                  image: Object.assign({}, this.state.image, data),
+                });
               }}
             />
           </View>
@@ -147,7 +170,7 @@ export default class ImageScreen extends React.Component {
             <View style={styles.buttonsContainer}>
               <Icon
                 name="check"
-                onPress={this._onPressSave}
+                onPress={this._onPressNew}
                 size={70}
                 style={styles.icon}
               />
