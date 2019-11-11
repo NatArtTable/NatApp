@@ -1,16 +1,18 @@
 import React from 'react';
-import {StyleSheet, Image, Text, View} from 'react-native';
+import {StyleSheet, Image, Text, View, TouchableOpacity} from 'react-native';
 
 export default class ImageViewer extends React.Component {
   constructor(props) {
     super(props);
+
+    this.render = this.render.bind(this);
   }
 
   render() {
     const style = {...this.props.style, backgroundColor: '#e1e4e8'};
 
     return (
-      <View style={style}>
+      <TouchableOpacity onPress={this.props.onPress} style={style}>
         <Image
           style={styles.image}
           source={{uri: this.props.source.thumbnail_uri}}
@@ -29,7 +31,7 @@ export default class ImageViewer extends React.Component {
         <View style={styles.labelContainer}>
           <Text style={styles.textLabel}>{this.props.label}</Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   }
 }

@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {Icon} from 'react-native-elements';
 import Autocomplete from 'react-native-autocomplete-input';
-import ImageViewer from '../components/ImageViewer';
+import ImageViewer from './ImageViewer';
 
 import TagInput from 'react-native-tags-input';
 
@@ -99,6 +99,7 @@ export default class ArtRefMetadataForm extends React.Component {
           this.props.containerStyle,
         ])}>
         <ImageViewer
+          onPress={this.props.onImagePress}
           style={imageStyle}
           source={{
             thumbnail_uri: this.props.data.thumbnail_uri,

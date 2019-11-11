@@ -17,8 +17,8 @@ export default class App extends React.Component {
     super(props);
 
     this._MainNavigator = createStackNavigator({
-      Login: {screen: LoginScreen},
       Home: {screen: HomeScreen},
+      Login: {screen: LoginScreen},
       Image: {screen: ImageScreen},
     });
 

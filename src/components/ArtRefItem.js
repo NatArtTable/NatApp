@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import ImageViewer from './ImageViewer';
 
 export default class ArtRefItem extends React.Component {
@@ -11,11 +11,9 @@ export default class ArtRefItem extends React.Component {
     const itemSyle = {...styles.item, ...this.props};
 
     return (
-      <TouchableOpacity
-        onPress={this.props.onPress}
-        style={itemSyle}
-        key={this.props.id}>
+      <View style={itemSyle} key={this.props.id}>
         <ImageViewer
+          onPress={this.props.onPress}
           label={this.props.folder}
           style={styles.image}
           source={{
@@ -24,7 +22,7 @@ export default class ArtRefItem extends React.Component {
           }}
           resizeMode="contain"
         />
-      </TouchableOpacity>
+      </View>
     );
   }
 }

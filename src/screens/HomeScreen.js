@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, BackHandler} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import {withNavigationFocus} from 'react-navigation';
 
 import ActionsBar from '../components/ActionsBar';
@@ -27,13 +27,11 @@ class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      numberOfTimesBackButtonPressed: 0,
       items: [],
       query: {text: ''},
       loading: false,
     };
 
-    this._handleBackPress = this._handleBackPress.bind(this);
     this.render = this.render.bind(this);
     this.search = this.search.bind(this);
     this._onSearchFormChange = this._onSearchFormChange.bind(this);
@@ -45,10 +43,6 @@ class HomeScreen extends React.Component {
     this.focusListener = this.props.navigation.addListener(
       'didFocus',
       this._onFocus,
-    );
-    this._backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      this._handleBackPress,
     );
   }
 
@@ -70,22 +64,6 @@ class HomeScreen extends React.Component {
     });
   }
 
-  _handleBackPress() {
-    console.log('HomeScreen _handleBackPress Called!');
-
-    if (this._actionsBar.isToggled()) {
-      this._actionsBar.untoggle();
-      this.setState({numberOfTimesBackButtonPressed: 0});
-    } else {
-      this.setState({
-        numberOfTimesBackButtonPressed:
-          this.state.numberOfTimesBackButtonPressed + 1,
-      });
-    }
-
-    return true;
-  }
-
   _onSearchFormChange(query) {
     this.setState({query}, () => this.search());
   }
@@ -103,10 +81,6 @@ class HomeScreen extends React.Component {
   }
 
   render() {
-    if (this.state.numberOfTimesBackButtonPressed >= 2) {
-      BackHandler.exitApp();
-    }
-
     return (
       <View style={styles.container}>
         <View styles={styles.searchBarContainer}>

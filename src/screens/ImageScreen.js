@@ -1,12 +1,14 @@
 import React from 'react';
 import {Alert, StyleSheet, ScrollView, View} from 'react-native';
 import Icon from 'react-native-vector-icons/EvilIcons';
+import {withNavigationFocus} from 'react-navigation';
 
 import ArtRefMetadataForm from '../components/ArtRefMetadataForm';
 import repository from '../components/Repository';
 import Loading from '../components/Loading';
+import ImageBigViewer from '../components/ImageBigViewer';
 
-export default class ImageScreen extends React.Component {
+class ImageScreen extends React.Component {
   static navigationOptions = {
     title: 'Art Reference',
   };
@@ -38,9 +40,11 @@ export default class ImageScreen extends React.Component {
       mode,
       image,
       loading: false,
+      big: false,
     };
 
     this._onFormSubmit = this._onFormSubmit.bind(this);
+    this._onImagePress = this._onImagePress.bind(this);
     this._addImage = this._addImage.bind(this);
     this._updateImage = this._updateImage.bind(this);
     this._onPressSave = this._onPressSave.bind(this);
@@ -68,6 +72,11 @@ export default class ImageScreen extends React.Component {
         .catch(err => Alert.alert('Error!', err.message))
         .finally(() => this.setState({loading: false}));
     });
+  }
+
+  _onImagePress() {
+    console.log('BIG!');
+    this.setState({big: true});
   }
 
   _onPressSave() {
@@ -157,6 +166,7 @@ export default class ImageScreen extends React.Component {
         <ScrollView>
           <View style={styles.formContainer}>
             <ArtRefMetadataForm
+              onImagePress={this._onImagePress}
               containerStyle={styles.form}
               data={image}
               onChangeData={data => {
@@ -192,11 +202,18 @@ export default class ImageScreen extends React.Component {
             </View>
           )}
         </ScrollView>
+        <ImageBigViewer
+          on={this.state.big}
+          uri={image.public_uri}
+          onSwipeDown={() => this.setState({big: false})}
+        />
         <Loading on={this.state.loading} />
       </View>
     );
   }
 }
+
+export default withNavigationFocus(ImageScreen);
 
 const styles = StyleSheet.create({
   container: {
