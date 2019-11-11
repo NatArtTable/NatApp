@@ -120,8 +120,8 @@ class Repository {
   addImage(uri, width, height, description = '', tags = [], folder = '') {
     return ImageResizer.createResizedImage(
       uri,
-      200,
-      200,
+      50,
+      50,
       'PNG',
       100,
       0,
@@ -137,7 +137,7 @@ class Repository {
             description,tags,folder
           ) VALUES 
           (
-            "${uri}","${uri}","${uri}",
+            "${response.uri}","${uri}","${uri}",
             ${width},${height},
             "${description}","${tags.join(',')}","${folder}"
           )
@@ -183,7 +183,7 @@ class Repository {
 
     return this._executeSql(
       `SELECT * FROM tb_images 
-       WHERE description || ' ' || tags LIKE '%${text}%'`,
+       WHERE description || ' ' || tags || ' ' || folder LIKE '%${text}%'`,
     ).then(res => {
       var rows = [];
       for (var i = 0; i < res.rows.length; i++) {

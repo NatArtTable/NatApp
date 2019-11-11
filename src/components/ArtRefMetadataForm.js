@@ -93,7 +93,8 @@ export default class ArtRefMetadataForm extends React.Component {
           style={imageStyle}
           source={{
             thumbnail_uri: this.props.data.thumbnail_uri,
-            uri: this.props.data.uri,
+            uri: this.props.data.public_uri,
+            fallback_uri: this.props.data.uri,
           }}
           resizeMode="contain"
           label={this.props.data.folder}

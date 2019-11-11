@@ -20,7 +20,7 @@ export default class ArtRefItem extends React.Component {
           style={styles.image}
           source={{
             thumbnail_uri: this.props.thumbnail_uri,
-            uri: this.props.uri,
+            uri: this.props.public_uri,
           }}
           resizeMode="contain"
         />

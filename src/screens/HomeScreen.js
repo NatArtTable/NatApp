@@ -8,6 +8,15 @@ import SearchForm from '../components/SearchForm';
 import ArtRefsViewer from '../components/ArtRefsViewer';
 
 import repository from '../components/Repository';
+import Loading from '../components/Loading';
+
+function debounce(func, wait) {
+  let timer = null;
+  return function() {
+    clearTimeout(timer);
+    timer = setTimeout(func, wait);
+  };
+}
 
 class HomeScreen extends React.Component {
   static navigationOptions = {
@@ -17,20 +26,26 @@ class HomeScreen extends React.Component {
 
   constructor(props) {
     super(props);
-
     this.state = {
       numberOfTimesBackButtonPressed: 0,
       items: [],
       query: {text: ''},
+      loading: false,
     };
 
     this._handleBackPress = this._handleBackPress.bind(this);
     this.render = this.render.bind(this);
     this.search = this.search.bind(this);
+    this._onSearchFormChange = this._onSearchFormChange.bind(this);
     this.onItemPressed = this.onItemPressed.bind(this);
     this.addImage = this.addImage.bind(this);
-    this.research = this.research.bind(this);
+    this._onFocus = this._onFocus.bind(this);
+    this.search = debounce(this.search, 200);
 
+    this.focusListener = this.props.navigation.addListener(
+      'didFocus',
+      this._onFocus,
+    );
     this._backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       this._handleBackPress,
@@ -38,18 +53,25 @@ class HomeScreen extends React.Component {
   }
 
   componentDidMount() {
-    this.research();
+    this.search();
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.isFocused !== this.props.isFocused) {
-      console.log('Tab refocused. Redoing search...');
-      this.research();
-    }
+  _onFocus() {
+    this.search();
   }
 
-  research() {
-    this.search(this.state.query);
+  search() {
+    this.setState({loading: true}, () => {
+      console.log(`Buscando com query: ${JSON.stringify(this.state.query)}`);
+      repository
+        .search(this.state.query)
+        .then(res => {
+          console.log(`Encontrados ${res.length} resultados para esta busca!`);
+          this.setState({items: res});
+        })
+        .catch(err => console.error(err))
+        .finally(() => this.setState({loading: false}));
+    });
   }
 
   _handleBackPress() {
@@ -68,23 +90,19 @@ class HomeScreen extends React.Component {
     return true;
   }
 
-  search(query) {
-    console.log(`Buscando com query: ${JSON.stringify(query)}`);
-    repository
-      .search(query)
-      .then(res => {
-        console.log(`Encontrados ${res.length} resultados para esta busca!`);
-        this.setState({items: res, query});
-      })
-      .catch(err => console.error(err));
+  _onSearchFormChange(query) {
+    this.setState({query}, () => this.search());
   }
 
   onItemPressed(item) {
-    this.props.navigation.push('Image', {image: item, mode: 'edit'});
+    this.setState({loading: true}, () =>
+      this.props.navigation.push('Image', {image: item, mode: 'edit'}),
+    );
     return true;
   }
 
   addImage(image) {
+    this.setState({loading: true});
     this.props.navigation.push('Image', {image, mode: 'add'});
   }
 
@@ -97,7 +115,7 @@ class HomeScreen extends React.Component {
       <View style={styles.container}>
         <View styles={styles.searchBarContainer}>
           <SearchForm
-            onChange={this.search}
+            onChange={this._onSearchFormChange}
             ref={search => {
               this._searchForm = search;
             }}
@@ -118,6 +136,7 @@ class HomeScreen extends React.Component {
             }}
           />
         </View>
+        <Loading on={this.state.loading} />
       </View>
     );
   }

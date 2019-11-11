@@ -1,12 +1,12 @@
 import React from 'react';
 import {Alert, StyleSheet, ScrollView, View} from 'react-native';
 import Icon from 'react-native-vector-icons/EvilIcons';
-import {withNavigationFocus} from 'react-navigation';
 
 import ArtRefMetadataForm from '../components/ArtRefMetadataForm';
 import repository from '../components/Repository';
+import Loading from '../components/Loading';
 
-class ImageScreen extends React.Component {
+export default class ImageScreen extends React.Component {
   static navigationOptions = {
     title: 'Art Reference',
   };
@@ -19,51 +19,51 @@ class ImageScreen extends React.Component {
         tags: [],
         folder: '',
         description: '',
-        submitted: false,
         width: 1,
         height: 1,
+        uri: '',
       },
-      this.props.image,
+      this.props.navigation.getParam('image', {}),
     );
 
-    this.state = {mode: 'add', image, submitted: false};
+    console.log(
+      `Tab ImageScreen called with parameters mode -> ${mode} and image.uri ->${
+        image.uri
+      }`,
+    );
+
+    const mode = this.props.navigation.getParam('mode', {});
+
+    this.state = {
+      mode,
+      image,
+      loading: false,
+    };
 
     this._onFormSubmit = this._onFormSubmit.bind(this);
     this._addImage = this._addImage.bind(this);
     this._updateImage = this._updateImage.bind(this);
-    this._onFocus = this._onFocus.bind(this);
     this._onPressSave = this._onPressSave.bind(this);
     this._onPressTrash = this._onPressTrash.bind(this);
-
-    this.focusListener = this.props.navigation.addListener(
-      'didFocus',
-      this._onFocus,
-    );
   }
 
-  _onFocus() {
-    const image = this.props.navigation.getParam('image', {});
-    const mode = this.props.navigation.getParam('mode', {});
+  _onFormSubmit(action = 'save') {
+    console.log(`Image Screen submitted form with action: ${action}`);
 
-    console.log(
-      `Tab ImageScreen refocused. With parameters mode -> ${mode} and image ->${JSON.stringify(
-        image,
-      )}`,
-    );
+    this.setState({loading: true}, () => {
+      var promise = null;
 
-    this.setState({mode, image: Object.assign(this.state.image, image)});
-  }
-
-  _onFormSubmit() {
-    if (this.state.submitted) {
-      return;
-    }
-
-    if (this.state.mode === 'add') {
-      this._addImage();
-    } else if (this.state.mode === 'edit') {
-      this._updateImage();
-    }
+      if (action === 'save') {
+        if (this.state.mode === 'add') {
+          promise = this._addImage();
+        } else if (this.state.mode === 'edit') {
+          promise = this._updateImage();
+        }
+      } else if (action === 'delete') {
+        promise = this._deleteImage();
+      }
+      promise.then(() => this.props.navigation.goBack());
+    });
   }
 
   _onPressSave() {
@@ -88,9 +88,7 @@ class ImageScreen extends React.Component {
           text: 'Do It!',
           onPress: () => {
             console.log(`Removendo Imagem! id: ${this.state.image.id}`);
-            repository
-              .removeImage(this.state.image.id)
-              .then(() => this.props.navigation.goBack());
+            this._onFormSubmit('delete');
           },
         },
         {text: 'Cancel', onPress: () => console.log('Cancel Pressed')},
@@ -99,34 +97,35 @@ class ImageScreen extends React.Component {
   }
 
   _addImage() {
-    this.setState({submitted: true});
-
     const image = this.state.image;
 
     console.log(`Adding ArtRef! uri: ${image.uri}`);
 
-    return repository
-      .addImage(
-        image.uri,
-        image.width,
-        image.height,
-        image.description,
-        image.tags,
-        image.folder,
-      )
-      .then(() => this.props.navigation.goBack());
+    return repository.addImage(
+      image.uri,
+      image.width,
+      image.height,
+      image.description,
+      image.tags,
+      image.folder,
+    );
   }
 
   _updateImage() {
-    this.setState({submitted: true});
-
     const image = this.state.image;
 
-    console.log(`Adding ArtRef! uri: ${image.uri}`);
+    console.log(`Updating ArtRef! uri: ${image.uri}; id: ${image.id}`);
 
-    return repository
-      .updateImage(image.id, image.description, image.tags, image.folder)
-      .then(() => this.props.navigation.goBack());
+    return repository.updateImage(
+      image.id,
+      image.description,
+      image.tags,
+      image.folder,
+    );
+  }
+
+  _deleteImage() {
+    return repository.removeImage(this.state.image.id);
   }
 
   render() {
@@ -148,7 +147,7 @@ class ImageScreen extends React.Component {
             <View style={styles.buttonsContainer}>
               <Icon
                 name="check"
-                onPress={this._onFormSubmit}
+                onPress={this._onPressSave}
                 size={70}
                 style={styles.icon}
               />
@@ -170,12 +169,11 @@ class ImageScreen extends React.Component {
             </View>
           )}
         </ScrollView>
+        <Loading on={this.state.loading} />
       </View>
     );
   }
 }
-
-export default withNavigationFocus(ImageScreen);
 
 const styles = StyleSheet.create({
   container: {

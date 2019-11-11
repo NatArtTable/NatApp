@@ -18,6 +18,11 @@ export default class ImageViewer extends React.Component {
         />
         <Image
           style={{...styles.imageOverlay, ...style.image}}
+          source={{uri: this.props.source.fallback_uri}}
+          resizeMode="contain"
+        />
+        <Image
+          style={{...styles.imageOverlay, ...style.image}}
           source={{uri: this.props.source.uri}}
           resizeMode="contain"
         />
