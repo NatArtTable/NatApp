@@ -28,12 +28,6 @@ class ImageScreen extends React.Component {
       this.props.navigation.getParam('image', {}),
     );
 
-    console.log(
-      `Tab ImageScreen called with parameters mode -> ${mode} and image.uri ->${
-        image.uri
-      }`,
-    );
-
     const mode = this.props.navigation.getParam('mode', {});
 
     this.state = {
@@ -42,6 +36,12 @@ class ImageScreen extends React.Component {
       loading: false,
       big: false,
     };
+
+    console.log(
+      `Tab ImageScreen called with parameters mode -> ${mode} and image.id ->${
+        image.id
+      }`,
+    );
 
     this._onFormSubmit = this._onFormSubmit.bind(this);
     this._onImagePress = this._onImagePress.bind(this);

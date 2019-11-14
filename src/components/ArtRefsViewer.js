@@ -21,7 +21,7 @@ export default class ArtRefsViewer extends React.Component {
   }
 
   _fitToScreen(item) {
-    const itemCopy = {...item};
+    const itemCopy = {...item, key: item.id};
 
     const columnWidth =
       this.state.width / this._getNumberOfColumns(this.state.width);

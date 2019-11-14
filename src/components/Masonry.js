@@ -29,7 +29,7 @@ class Column extends React.Component {
 
 export default class Masonry extends React.Component {
   static defaultProps = {
-    columnsNumber: 2,
+    columns: 2,
   };
 
   constructor(props) {
@@ -60,6 +60,26 @@ export default class Masonry extends React.Component {
       }
     }
     return smallest;
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.columns !== nextProps.columns) {
+      return true;
+    }
+
+    if (this.props.items.length !== nextProps.items.length) {
+      return true;
+    }
+
+    for (var i = 0; i < this.props.items.length; i++) {
+      if (this.props.items[i].key !== nextProps.items[i].key) {
+        return true;
+      }
+    }
+
+    console.log('Masonry rerendering prevented!');
+
+    return false;
   }
 
   render() {
