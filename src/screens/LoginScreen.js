@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View, TextInput, Image, Button} from 'react-native';
+import {StyleSheet, View, TextInput, Image, Button, Alert} from 'react-native';
 import {withNavigationFocus} from 'react-navigation';
 import repository from '../components/Repository';
 import logo from '../assets/logo.png';
@@ -18,7 +18,9 @@ class LoginScreen extends React.Component {
     this.state = {loading: true, email: '', password: ''};
 
     this._login = this._login.bind(this);
-    this._navigateToHome = this._navigateToHome.bind(this);
+    this._goBack = this._goBack.bind(this);
+    this._setEmail = this._setEmail.bind(this);
+    this._setPassword = this._setPassword.bind(this);
   }
 
   _login() {
@@ -26,24 +28,22 @@ class LoginScreen extends React.Component {
     this.setState({loading: true}, () =>
       repository
         .login(this.state.email, this.state.password)
-        .then(() => this._navigateToHome())
+        .catch(err => Alert.alert('Error!', err.message))
+        .then(() => this._goBack())
         .finally(() => this.setState({loading: false})),
     );
   }
 
-  _navigateToHome() {
-    this.props.navigation.navigate('Home');
+  _goBack() {
+    this.props.navigation.pop();
   }
 
   componentDidMount() {
-    repository
-      .isLogged()
-      .then(result => {
-        if (result) {
-          this._navigateToHome();
-        }
-      })
-      .finally(() => this.setState({loading: false}));
+    if (repository.isLogged()) {
+      this._goBack();
+    } else {
+      this.setState({loading: false});
+    }
   }
 
   _setEmail(email) {

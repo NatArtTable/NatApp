@@ -1,16 +1,32 @@
 import React from 'react';
-import {StyleSheet, Text, View, ScrollView} from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  View,
+  ScrollView,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import repository from '../components/Repository';
 
 export default class SideMenu extends React.Component {
   constructor(props) {
     super(props);
+
+    this._renderSidemenuHeader = this._renderSidemenuHeader.bind(this);
   }
 
-  _renderItem(text) {
+  _renderSidemenuHeader() {
+    if (repository.isLogged()) {
+      return <Text>Logged in as {repository.getCredential().email}</Text>;
+    } else {
+      return <Text>Not logged in</Text>;
+    }
+  }
+
+  _renderItem(text, onPress) {
     return (
-      <TouchableOpacity style={styles.itemContainer}>
+      <TouchableOpacity onPress={onPress} style={styles.itemContainer}>
         <Icon name="camera" size={22} style={styles.itemIcon} />
         <Text style={styles.itemText}>{text}</Text>
       </TouchableOpacity>
@@ -21,25 +37,12 @@ export default class SideMenu extends React.Component {
     return this.props.on ? (
       <View style={styles.container}>
         <View style={styles.sidemenu}>
-          <View style={styles.head} />
-          <ScrollView>
-            {this._renderItem('Item 1')}
-            {this._renderItem('Item 2')}
-            {this._renderItem('Item 3')}
-            {this._renderItem('Item 3')}
-            {this._renderItem('Item 3')}
-            {this._renderItem('Item 3')}
-            {this._renderItem('Item 3')}
-            {this._renderItem('Item 3')}
-            {this._renderItem('Item 3')}
-            {this._renderItem('Item 3')}
-            {this._renderItem('Item 3')}
-            {this._renderItem('Item 3')}
-            {this._renderItem('Item 3')}
-            {this._renderItem('Item 3')}
-            {this._renderItem('Item 3')}
-          </ScrollView>
-          {this._renderItem('Logout')}
+          <View style={styles.head}>{this._renderSidemenuHeader()}</View>
+          <ScrollView style={styles.scroll} />
+          {this._renderItem(
+            this.props.lastButtonLabel,
+            this.props.onLastButtonClicked,
+          )}
         </View>
         <View
           style={styles.rest}
@@ -54,6 +57,8 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     flexDirection: 'row',
+    height: '100%',
+    width: '100%',
   },
   rest: {
     flex: 1,

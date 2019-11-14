@@ -1,7 +1,7 @@
 import SQLite from 'react-native-sqlite-storage';
 import ImageResizer from 'react-native-image-resizer';
 import RNFS from 'react-native-fs';
-import AsyncStorage from 'react-native';
+import {AsyncStorage} from 'react-native';
 
 class Repository {
   constructor() {
@@ -16,6 +16,12 @@ class Repository {
     this._createFolderIfNotExists = this._createFolderIfNotExists.bind(this);
     this.login = this.login.bind(this);
 
+    AsyncStorage.getItem('credential')
+      .then(credential => {
+        this.credential = credential;
+      })
+      .catch(e => console.error(e));
+
     this.db = SQLite.openDatabase(
       'repository.db',
       '1.0',
@@ -27,16 +33,27 @@ class Repository {
   }
 
   async login(email, password) {
-    await AsyncStorage.setItem('token', 'I like to save it.');
+    const credential = {email, token: 'I like to save it.'};
+    await AsyncStorage.setItem('credential', JSON.stringify(credential));
+    this.credential = credential;
   }
 
-  async isLogged() {
-    const token = await AsyncStorage.getItem('token');
-    if (token === null) {
+  async logout() {
+    await AsyncStorage.removeItem('credential');
+    this.credential = null;
+  }
+
+  isLogged() {
+    console.log(`Current credential: ${this.credential}`);
+    if (this.credential === null) {
       return false;
     } else {
       return true;
     }
+  }
+
+  getCredential() {
+    return {email: this.credential.email};
   }
 
   _executeSql(query) {

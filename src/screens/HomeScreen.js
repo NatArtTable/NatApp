@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, Alert} from 'react-native';
 import {withNavigationFocus} from 'react-navigation';
 
 import ActionsBar from '../components/ActionsBar';
@@ -43,6 +43,7 @@ class HomeScreen extends React.Component {
     this._setActionsBarRef = this._setActionsBarRef.bind(this);
     this._showSideMenu = this._showSideMenu.bind(this);
     this._hideSideMenu = this._hideSideMenu.bind(this);
+    this._onLoginLogoutPress = this._onLoginLogoutPress.bind(this);
 
     this.search = debounce(this.search, 200);
 
@@ -106,6 +107,38 @@ class HomeScreen extends React.Component {
     this.setState({sidemenu: false});
   }
 
+  _logout() {
+    this.setState({loading: true}, () =>
+      repository
+        .logout()
+        .catch(e => Alert.alert('Error', e.message))
+        .finally(() => this.setState({loading: false})),
+    );
+  }
+
+  _login() {
+    console.log('Redirectiong to login screen...');
+    this.props.navigation.push('Login');
+  }
+
+  _onLoginLogoutPress() {
+    if (repository.isLogged()) {
+      Alert.alert('Logout', 'You are sure you want logout from your account?', [
+        {
+          text: 'Do It!',
+          onPress: () => {
+            console.log('Loggoing out');
+            this._logout();
+          },
+        },
+        {text: 'Cancel', onPress: () => console.log('Cancel Pressed')},
+      ]);
+    } else {
+      console.log('Redirectiong to login screen...');
+      this._login();
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -129,10 +162,14 @@ class HomeScreen extends React.Component {
             ref={this._setActionsBarRef}
           />
         </View>
-        <SideMenu
-          on={this.state.sidemenu}
-          onClickedOutOfMenu={this._hideSideMenu}
-        />
+        <View style={styles.sidemenuContainer}>
+          <SideMenu
+            on={this.state.sidemenu}
+            onClickedOutOfMenu={this._hideSideMenu}
+            onLastButtonClicked={this._onLoginLogoutPress}
+            lastButtonLabel={repository.isLogged() ? 'logout' : 'login'}
+          />
+        </View>
         <Loading on={this.state.loading} />
       </View>
     );
@@ -143,7 +180,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-
+  sidemenuContainer: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+  },
   actionsBarContainer: {
     width: '100%',
     position: 'absolute',
