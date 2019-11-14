@@ -8,17 +8,21 @@ export default class ArtRefItem extends React.Component {
   }
 
   render() {
-    const itemSyle = {...styles.item, ...this.props};
+    const itemSyle = {
+      ...styles.item,
+      width: this.props.item.width,
+      height: this.props.item.height,
+    };
 
     return (
-      <View style={itemSyle} key={this.props.id}>
+      <View style={itemSyle} key={this.props.item.id}>
         <ImageViewer
-          onPress={this.props.onPress}
-          label={this.props.folder}
+          onPress={() => this.props.onPress(this.props.item)}
+          label={this.props.item.folder}
           style={styles.image}
           source={{
-            thumbnail_uri: this.props.thumbnail_uri,
-            uri: this.props.public_uri,
+            thumbnail_uri: this.props.item.thumbnail_uri,
+            uri: this.props.item.public_uri,
           }}
           resizeMode="contain"
         />

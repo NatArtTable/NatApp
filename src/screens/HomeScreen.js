@@ -38,6 +38,12 @@ class HomeScreen extends React.Component {
     this.onItemPressed = this.onItemPressed.bind(this);
     this.addImage = this.addImage.bind(this);
     this._onFocus = this._onFocus.bind(this);
+
+    this._setSearchFormRef = this._setSearchFormRef.bind(this);
+    this._setActionsBarRef = this._setActionsBarRef.bind(this);
+    this._showSideMenu = this._showSideMenu.bind(this);
+    this._hideSideMenu = this._hideSideMenu.bind(this);
+
     this.search = debounce(this.search, 200);
 
     this.focusListener = this.props.navigation.addListener(
@@ -84,15 +90,29 @@ class HomeScreen extends React.Component {
     this.props.navigation.push('Image', {image, mode: 'add'});
   }
 
+  _setSearchFormRef(search) {
+    this._searchForm = search;
+  }
+
+  _setActionsBarRef(bar) {
+    this._actionsBar = bar;
+  }
+
+  _showSideMenu() {
+    this.setState({sidemenu: true});
+  }
+
+  _hideSideMenu() {
+    this.setState({sidemenu: false});
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <View styles={styles.searchBarContainer}>
           <SearchForm
             onChange={this._onSearchFormChange}
-            ref={search => {
-              this._searchForm = search;
-            }}
+            ref={this._setSearchFormRef}
           />
         </View>
         <ArtRefsViewer
@@ -100,20 +120,18 @@ class HomeScreen extends React.Component {
           ref={viewer => {
             this._artRefsViewer = viewer;
           }}
-          onItemPressed={item => this.onItemPressed(item)}
+          onItemPressed={this.onItemPressed}
         />
         <View style={styles.actionsBarContainer}>
           <ActionsBar
-            onBarsPressed={() => this.setState({sidemenu: true})}
+            onBarsPressed={this._showSideMenu}
             onAddImage={this.addImage}
-            ref={bar => {
-              this._actionsBar = bar;
-            }}
+            ref={this._setActionsBarRef}
           />
         </View>
         <SideMenu
           on={this.state.sidemenu}
-          onClickedOutOfMenu={() => this.setState({sidemenu: false})}
+          onClickedOutOfMenu={this._hideSideMenu}
         />
         <Loading on={this.state.loading} />
       </View>

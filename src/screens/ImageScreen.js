@@ -50,6 +50,10 @@ class ImageScreen extends React.Component {
     this._onPressSave = this._onPressSave.bind(this);
     this._onPressNew = this._onPressNew.bind(this);
     this._onPressTrash = this._onPressTrash.bind(this);
+    this._hideBigViewer = this._hideBigViewer.bind(this);
+    this._onArtRefMetadaFormChangeData = this._onArtRefMetadaFormChangeData.bind(
+      this,
+    );
   }
 
   _onFormSubmit(action = 'save') {
@@ -158,6 +162,14 @@ class ImageScreen extends React.Component {
     return repository.removeImage(this.state.image.id);
   }
 
+  _onArtRefMetadaFormChangeData(data) {
+    this.setState({image: Object.assign({}, this.state.image, data)});
+  }
+
+  _hideBigViewer() {
+    this.setState({big: false});
+  }
+
   render() {
     const image = this.state.image;
 
@@ -169,11 +181,7 @@ class ImageScreen extends React.Component {
               onImagePress={this._onImagePress}
               containerStyle={styles.form}
               data={image}
-              onChangeData={data => {
-                this.setState({
-                  image: Object.assign({}, this.state.image, data),
-                });
-              }}
+              onChangeData={this._onArtRefMetadaFormChangeData}
             />
           </View>
           {this.state.mode === 'add' ? (
@@ -205,7 +213,7 @@ class ImageScreen extends React.Component {
         <ImageBigViewer
           on={this.state.big}
           uri={image.public_uri}
-          onSwipeDown={() => this.setState({big: false})}
+          onSwipeDown={this._hideBigViewer}
         />
         <Loading on={this.state.loading} />
       </View>

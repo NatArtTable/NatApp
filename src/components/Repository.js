@@ -1,7 +1,7 @@
 import SQLite from 'react-native-sqlite-storage';
 import ImageResizer from 'react-native-image-resizer';
 import RNFS from 'react-native-fs';
-import {AsyncStorage} from 'react-native';
+import AsyncStorage from 'react-native';
 
 class Repository {
   constructor() {
@@ -72,9 +72,9 @@ class Repository {
       .catch(e => console.error(e));
     // );
 
-    RNFS.mkdir(this.thumbnailPath).then(() =>
-      console.log('images folder created!'),
-    );
+    RNFS.mkdir(this.thumbnailPath)
+      .then(() => console.log('images folder created!'))
+      .catch(e => console.error(e));
   }
 
   _createTables() {
@@ -132,11 +132,11 @@ class Repository {
 
   addImage(uri, width, height, description = '', tags = [], folder = '') {
     return this._createFolderIfNotExists(folder)
-      .then(
+      .then(() =>
         ImageResizer.createResizedImage(
           uri,
-          50,
-          50,
+          200,
+          200,
           'PNG',
           100,
           0,
@@ -144,7 +144,8 @@ class Repository {
         ),
       )
       .then(response => {
-        console.log(`Image resized: ${JSON.stringify(response)}`);
+        console.log('Image resized!');
+        console.log(`Saved resized image at uri: ${response.uri}`);
         return this._executeSql(`
           INSERT INTO \`tb_images\`
           (
@@ -158,8 +159,7 @@ class Repository {
             "${description}","${tags.join(',')}","${folder}"
           )
         `);
-      })
-      .catch(err => console.error(err));
+      });
   }
 
   updateImage(id, description = '', tags = [], folder = '') {

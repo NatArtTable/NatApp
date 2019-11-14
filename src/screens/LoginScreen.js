@@ -46,6 +46,14 @@ class LoginScreen extends React.Component {
       .finally(() => this.setState({loading: false}));
   }
 
+  _setEmail(email) {
+    this.setState({email});
+  }
+
+  _setPassword(password) {
+    this.setState({password});
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -55,13 +63,13 @@ class LoginScreen extends React.Component {
             placeholder="Email"
             style={styles.input}
             value={this.state.email}
-            onChangeText={email => this.setState({email})}
+            onChangeText={this._setEmail}
           />
           <TextInput
             placeholder="Password"
             style={styles.input}
             value={this.state.password}
-            onChangeText={password => this.setState({password})}
+            onChangeText={this._setPassword}
           />
           <Button title="login" onPress={this._login} />
         </View>
